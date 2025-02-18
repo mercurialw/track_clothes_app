@@ -20,8 +20,6 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request) {
         User user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
                 .email(request.getEmail())
                 .role(Role.USER)
                 .password(passwordEncoder.encode(request.getPassword()))
