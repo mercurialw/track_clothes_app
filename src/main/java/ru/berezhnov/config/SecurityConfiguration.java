@@ -29,7 +29,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(req -> {
             req.requestMatchers("/api/auth/**").permitAll();
-            req.requestMatchers("/api/demo").authenticated();
+            req.requestMatchers("/api/**").authenticated();
         });
         http.sessionManagement(sessionAuthenticationStrategy ->
                 sessionAuthenticationStrategy.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
