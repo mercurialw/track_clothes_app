@@ -1,6 +1,7 @@
-package ru.berezhnov.cloth;
+package ru.berezhnov.cloth.type;
 
 import jakarta.persistence.*;
+import ru.berezhnov.cloth.Cloth;
 
 import java.util.List;
 

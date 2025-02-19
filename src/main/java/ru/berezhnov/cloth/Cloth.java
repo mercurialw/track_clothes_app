@@ -1,6 +1,7 @@
 package ru.berezhnov.cloth;
 
 import jakarta.persistence.*;
+import ru.berezhnov.cloth.type.ClothType;
 import ru.berezhnov.user.User;
 
 @Entity
