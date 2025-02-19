@@ -1,18 +1,10 @@
 package ru.berezhnov.cloth;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "cloth_type")
 public class ClothType {
     @Id
@@ -25,4 +17,28 @@ public class ClothType {
 
     @OneToMany(mappedBy = "type")
     private List<Cloth> clothes;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Cloth> getClothes() {
+        return clothes;
+    }
+
+    public void setClothes(List<Cloth> clothes) {
+        this.clothes = clothes;
+    }
 }

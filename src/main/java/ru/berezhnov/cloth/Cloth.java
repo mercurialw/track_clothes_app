@@ -1,16 +1,8 @@
 package ru.berezhnov.cloth;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import ru.berezhnov.user.User;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "cloth")
 public class Cloth {
@@ -33,4 +25,44 @@ public class Cloth {
     @ManyToOne
     @JoinColumn(name = "owner", referencedColumnName = "id")
     private User owner;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ClothType getType() {
+        return type;
+    }
+
+    public void setType(ClothType type) {
+        this.type = type;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
 }

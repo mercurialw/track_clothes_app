@@ -1,6 +1,6 @@
 package ru.berezhnov.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +14,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.berezhnov.user.UserRepository;
 
 @Configuration
-@RequiredArgsConstructor
 public class ApplicationConfig {
+
     private final UserRepository userRepository;
+
+    @Autowired
+    public ApplicationConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
