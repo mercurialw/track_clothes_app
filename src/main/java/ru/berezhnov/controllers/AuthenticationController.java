@@ -1,4 +1,4 @@
-package ru.berezhnov.auth;
+package ru.berezhnov.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.berezhnov.auth.AuthenticationRequest;
+import ru.berezhnov.auth.AuthenticationResponse;
+import ru.berezhnov.auth.AuthenticationService;
+import ru.berezhnov.auth.RegisterRequest;
 
 @RestController
 @RequestMapping("/api/auth")
