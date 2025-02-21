@@ -6,10 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.berezhnov.auth.AuthenticationRequest;
-import ru.berezhnov.auth.AuthenticationResponse;
-import ru.berezhnov.auth.AuthenticationService;
-import ru.berezhnov.auth.RegisterRequest;
+import ru.berezhnov.dto.AuthenticationRequest;
+import ru.berezhnov.dto.AuthenticationResponse;
+import ru.berezhnov.services.AuthenticationService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,12 +22,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
     }
 }
