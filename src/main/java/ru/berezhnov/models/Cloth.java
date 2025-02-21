@@ -1,8 +1,8 @@
-package ru.berezhnov.cloth;
+package ru.berezhnov.models;
 
 import jakarta.persistence.*;
-import ru.berezhnov.cloth.type.ClothType;
-import ru.berezhnov.user.User;
+
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "cloth")
@@ -49,6 +49,9 @@ public class Cloth {
 
     public void setType(ClothType type) {
         this.type = type;
+        if (this.type.getClothes() == null)
+            this.type.setClothes(new ArrayList<>());
+        this.type.getClothes().add(this);
     }
 
     public String getPhotoUrl() {
@@ -65,5 +68,6 @@ public class Cloth {
 
     public void setOwner(User owner) {
         this.owner = owner;
+        this.owner.getClothes().add(this);
     }
 }
