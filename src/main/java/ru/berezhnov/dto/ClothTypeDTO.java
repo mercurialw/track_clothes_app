@@ -1,4 +1,4 @@
-package ru.berezhnov.cloth.type;
+package ru.berezhnov.dto;
 
 public class ClothTypeDTO {
 

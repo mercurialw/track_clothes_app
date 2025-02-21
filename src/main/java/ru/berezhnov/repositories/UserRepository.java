@@ -1,6 +1,7 @@
-package ru.berezhnov.user;
+package ru.berezhnov.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import ru.berezhnov.models.User;
 
 import java.util.Optional;
 

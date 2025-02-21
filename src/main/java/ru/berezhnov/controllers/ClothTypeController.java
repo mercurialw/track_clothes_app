@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import ru.berezhnov.cloth.type.ClothType;
-import ru.berezhnov.cloth.type.ClothTypeDTO;
-import ru.berezhnov.cloth.type.ClothTypeService;
-import ru.berezhnov.cloth.type.ClothTypeValidator;
+import ru.berezhnov.models.ClothType;
+import ru.berezhnov.dto.ClothTypeDTO;
+import ru.berezhnov.services.ClothTypeService;
+import ru.berezhnov.util.ClothTypeValidator;
 
 import java.util.List;
 import java.util.Optional;
