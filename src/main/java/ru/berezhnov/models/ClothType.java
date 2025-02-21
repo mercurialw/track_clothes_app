@@ -1,7 +1,6 @@
-package ru.berezhnov.cloth.type;
+package ru.berezhnov.models;
 
 import jakarta.persistence.*;
-import ru.berezhnov.cloth.Cloth;
 
 import java.util.List;
 
@@ -18,6 +17,12 @@ public class ClothType {
 
     @OneToMany(mappedBy = "type")
     private List<Cloth> clothes;
+
+    public ClothType() {}
+
+    public ClothType(String name) {
+        this.name = name;
+    }
 
     public int getId() {
         return id;
