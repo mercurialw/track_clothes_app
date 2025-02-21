@@ -1,14 +1,15 @@
-package ru.berezhnov.auth;
+package ru.berezhnov.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.berezhnov.dto.AuthenticationRequest;
+import ru.berezhnov.dto.AuthenticationResponse;
 import ru.berezhnov.config.JwtService;
-import ru.berezhnov.user.Role;
-import ru.berezhnov.user.User;
-import ru.berezhnov.user.UserRepository;
+import ru.berezhnov.models.User;
+import ru.berezhnov.repositories.UserRepository;
 
 @Service
 public class AuthenticationService {
@@ -27,10 +28,10 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(AuthenticationRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setRole(Role.USER);
+        user.setRole(User.Role.USER);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);

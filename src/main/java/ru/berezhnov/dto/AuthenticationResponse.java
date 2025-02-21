@@ -1,4 +1,4 @@
-package ru.berezhnov.auth;
+package ru.berezhnov.dto;
 
 public class AuthenticationResponse {
     private String token;
