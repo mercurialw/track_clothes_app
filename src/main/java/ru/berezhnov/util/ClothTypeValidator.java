@@ -1,9 +1,11 @@
-package ru.berezhnov.cloth.type;
+package ru.berezhnov.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+import ru.berezhnov.models.ClothType;
+import ru.berezhnov.services.ClothTypeService;
 
 @Component
 public class ClothTypeValidator implements Validator {
