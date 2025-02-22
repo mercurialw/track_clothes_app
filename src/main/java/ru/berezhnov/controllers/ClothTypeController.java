@@ -7,27 +7,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import ru.berezhnov.models.ClothType;
 import ru.berezhnov.dto.ClothTypeDTO;
+import ru.berezhnov.models.ClothType;
 import ru.berezhnov.services.ClothTypeService;
 import ru.berezhnov.util.ClothTypeValidator;
+import ru.berezhnov.util.AppException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/cloth_type")
 public class ClothTypeController {
 
     private final ClothTypeService clothTypeService;
-    private final ModelMapper modelMapper;
     private final ClothTypeValidator clothTypeValidator;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public ClothTypeController(final ClothTypeService clothTypeService, ModelMapper modelMapper, ClothTypeValidator clothTypeValidator) {
+    public ClothTypeController(final ClothTypeService clothTypeService, ClothTypeValidator clothTypeValidator, ModelMapper modelMapper) {
         this.clothTypeService = clothTypeService;
-        this.modelMapper = modelMapper;
         this.clothTypeValidator = clothTypeValidator;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping
@@ -36,21 +36,13 @@ public class ClothTypeController {
                 .map(this::convertClothTypeToClothTypeDTO).toList());
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<ClothTypeDTO> getClothTypeById(@PathVariable final long id) {
-        Optional<ClothType> type = clothTypeService.findOne(id);
-        if (type.isPresent())
-            return ResponseEntity.ok(convertClothTypeToClothTypeDTO(type.get()));
-        return ResponseEntity.notFound().build();
-    }
-
     @PostMapping
     public ResponseEntity<?> saveClothType(@RequestBody ClothTypeDTO clothTypeDTO) {
         ClothType clothType = convertClothTypeDTOToClothType(clothTypeDTO);
         Errors errors = new BeanPropertyBindingResult(clothType, "clothType");
         clothTypeValidator.validate(clothType, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            throw new AppException("Cloth type already exists");
         }
         clothTypeService.save(clothType);
         return ResponseEntity.ok(HttpStatus.CREATED);
@@ -61,16 +53,6 @@ public class ClothTypeController {
         String clothTypeName = clothTypeDTO.getName();
         if (clothTypeService.findByName(clothTypeName).isPresent()) {
             clothTypeService.delete(clothTypeName);
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteClothType(@PathVariable final long id) {
-        Optional<ClothType> type = clothTypeService.findOne(id);
-        if (type.isPresent()) {
-            clothTypeService.delete(id);
             return ResponseEntity.ok(HttpStatus.OK);
         }
         return ResponseEntity.notFound().build();
