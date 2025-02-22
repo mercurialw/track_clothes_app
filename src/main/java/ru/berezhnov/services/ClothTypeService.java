@@ -15,7 +15,6 @@ public class ClothTypeService {
 
     private final ClothTypeRepository clothTypeRepository;
 
-
     @Autowired
     public ClothTypeService(ClothTypeRepository clothTypeRepository) {
         this.clothTypeRepository = clothTypeRepository;
@@ -25,10 +24,6 @@ public class ClothTypeService {
         return clothTypeRepository.findAll();
     }
 
-    public Optional<ClothType> findOne(long id) {
-        return clothTypeRepository.findById(id);
-    }
-
     public Optional<ClothType> findByName(String name) {
         return clothTypeRepository.findByName(name);
     }
@@ -36,11 +31,6 @@ public class ClothTypeService {
     @Transactional
     public void save(ClothType clothType) {
         clothTypeRepository.save(clothType);
-    }
-
-    @Transactional
-    public void delete(long id) {
-        clothTypeRepository.deleteById(id);
     }
 
     @Transactional
