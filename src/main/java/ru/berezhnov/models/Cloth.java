@@ -27,6 +27,10 @@ public class Cloth {
     @JoinColumn(name = "owner", referencedColumnName = "id")
     private User owner;
 
+    @ManyToOne
+    @JoinColumn(name = "place", referencedColumnName = "id")
+    private Place place;
+
     public int getId() {
         return id;
     }
@@ -69,5 +73,13 @@ public class Cloth {
     public void setOwner(User owner) {
         this.owner = owner;
         this.owner.getClothes().add(this);
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
 }
