@@ -4,6 +4,7 @@ public class ClothDTO {
     private String name;
     private String photoUrl;
     private ClothTypeDTO type;
+    private PlaceDTO place;
 
     public String getName() {
         return name;
@@ -27,5 +28,13 @@ public class ClothDTO {
 
     public void setType(ClothTypeDTO type) {
         this.type = type;
+    }
+
+    public PlaceDTO getPlace() {
+        return place;
+    }
+
+    public void setPlace(PlaceDTO place) {
+        this.place = place;
     }
 }
