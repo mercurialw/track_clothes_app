@@ -7,11 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.berezhnov.config.JwtService;
 import ru.berezhnov.dto.ClothDTO;
+import ru.berezhnov.dto.EmailResponse;
+import ru.berezhnov.dto.RenameClothRequest;
 import ru.berezhnov.models.Cloth;
 import ru.berezhnov.models.ClothType;
+import ru.berezhnov.models.Place;
 import ru.berezhnov.models.User;
 import ru.berezhnov.services.UserService;
-import ru.berezhnov.util.TrackClothesAppException;
+import ru.berezhnov.util.AppException;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +35,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<String> getUserDetails(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<EmailResponse> getUserDetails(@RequestHeader("Authorization") String authHeader) {
         Optional<User> user = getUserFromHeader(authHeader);
-        return ResponseEntity.ok(user.get().getEmail());
+        return ResponseEntity.ok(getUserEmail(user.orElseThrow(() ->
+                new AppException("User not found"))));
     }
 
     @GetMapping("/clothes")
@@ -47,23 +51,18 @@ public class UserController {
     @PostMapping("/clothes")
     public ResponseEntity<?> saveUserClothes(@RequestHeader("Authorization") String authHeader,
                                              @RequestBody List<ClothDTO> clothDTOs) {
-        if (clothDTOs.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        userService.save(getUserFromHeader(authHeader).orElseThrow(() -> new TrackClothesAppException("User not found")),
+        if (clothDTOs.isEmpty())
+            throw new AppException("There are no clothes");
+        userService.save(getUserFromHeader(authHeader).orElseThrow(() -> new AppException("User not found")),
                 clothDTOs.stream().map(this::convertClothDTOToCloth).toList());
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/clothes/update_name")
+    @PatchMapping("/clothes/update_name") // todo разобраться со случаем когда в бд есть две вещи со старым именем
     public ResponseEntity<?> updateUserClothName(@RequestHeader("Authorization") String authHeader,
-                                             @RequestBody List<String> names) {
-        if (names.size() < 2)
-            return ResponseEntity.badRequest().build();
-        if (names.get(0).equals(names.get(1)))
-            throw new TrackClothesAppException("Names are the same");
+                                                 @RequestBody RenameClothRequest request) {
         userService.update(getUserFromHeader(authHeader).orElseThrow(() ->
-                new TrackClothesAppException("User not found")), names.get(0), names.get(1));
+                new AppException("User not found")), request.getOldName(), request.getNewName());
         return ResponseEntity.ok().build();
     }
 
@@ -79,11 +78,11 @@ public class UserController {
     private Cloth convertClothDTOToCloth(ClothDTO clothDTO) {
         Cloth result = modelMapper.map(clothDTO, Cloth.class);
         result.setType(new ClothType(clothDTO.getType().getName()));
+        result.setPlace(new Place(clothDTO.getPlace().getName()));
         return result;
     }
 
-    @ExceptionHandler
-    public ResponseEntity<String> exception(TrackClothesAppException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    private EmailResponse getUserEmail(User user) {
+        return modelMapper.map(user, EmailResponse.class);
     }
 }
