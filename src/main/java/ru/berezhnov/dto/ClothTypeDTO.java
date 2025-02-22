@@ -1,7 +1,6 @@
 package ru.berezhnov.dto;
 
 public class ClothTypeDTO {
-
     private String name;
 
     public String getName() {
