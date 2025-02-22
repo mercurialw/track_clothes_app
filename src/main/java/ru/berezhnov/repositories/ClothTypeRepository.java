@@ -7,7 +7,7 @@ import ru.berezhnov.models.ClothType;
 import java.util.Optional;
 
 @Repository
-public interface ClothTypeRepository extends JpaRepository<ClothType, Long> {
+public interface ClothTypeRepository extends JpaRepository<ClothType, Integer> {
     Optional<ClothType> findByName(String name);
     void deleteByName(String name);
 }
