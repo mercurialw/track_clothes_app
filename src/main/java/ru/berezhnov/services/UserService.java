@@ -16,6 +16,7 @@ import ru.berezhnov.util.AppException;
 import java.util.List;
 import java.util.Optional;
 
+//unnecessary class
 @Service
 @Transactional(readOnly = true)
 public class UserService {
@@ -51,12 +52,5 @@ public class UserService {
             clothToSave.setPlace(persistedPlace);
             clothRepository.save(clothToSave);
         });
-    }
-
-    @Transactional
-    public void update(User user, String oldName, String newName) {
-        clothRepository.findByNameAndOwnerName(oldName, user.getEmail())
-                .orElseThrow(() -> new AppException("Cloth not found"))
-                .setName(newName);
     }
 }
