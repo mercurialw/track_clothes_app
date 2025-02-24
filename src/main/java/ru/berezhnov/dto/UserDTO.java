@@ -1,6 +1,6 @@
 package ru.berezhnov.dto;
 
-public class EmailResponse {
+public class UserDTO {
     private String email;
 
     public String getEmail() {
