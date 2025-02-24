@@ -55,7 +55,7 @@ public class ClothTypeController {
             clothTypeService.delete(clothTypeName);
             return ResponseEntity.ok(HttpStatus.OK);
         }
-        return ResponseEntity.notFound().build();
+        throw new AppException("Cloth type does not exist");
     }
 
     private ClothTypeDTO convertClothTypeToClothTypeDTO(ClothType clothType) {
