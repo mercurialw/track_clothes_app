@@ -31,6 +31,9 @@ public class Cloth {
     @JoinColumn(name = "place", referencedColumnName = "id")
     private Place place;
 
+    @Column(name = "size")
+    private String size;
+
     public int getId() {
         return id;
     }
@@ -72,6 +75,8 @@ public class Cloth {
 
     public void setOwner(User owner) {
         this.owner = owner;
+        if (this.owner.getClothes() == null)
+            this.owner.setClothes(new ArrayList<>());
         this.owner.getClothes().add(this);
     }
 
@@ -81,5 +86,16 @@ public class Cloth {
 
     public void setPlace(Place place) {
         this.place = place;
+        if (this.place.getClothes() == null)
+            this.place.setClothes(new ArrayList<>());
+        this.place.getClothes().add(this);
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 }
