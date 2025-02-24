@@ -2,13 +2,11 @@ package ru.berezhnov.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.berezhnov.config.JwtService;
 import ru.berezhnov.dto.ClothDTO;
-import ru.berezhnov.dto.EmailResponse;
-import ru.berezhnov.dto.RenameClothRequest;
+import ru.berezhnov.dto.UserDTO;
 import ru.berezhnov.models.Cloth;
 import ru.berezhnov.models.ClothType;
 import ru.berezhnov.models.Place;
@@ -35,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<EmailResponse> getUserDetails(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<UserDTO> getUserDetails(@RequestHeader("Authorization") String authHeader) {
         Optional<User> user = getUserFromHeader(authHeader);
         return ResponseEntity.ok(getUserEmail(user.orElseThrow(() ->
                 new AppException("User not found"))));
@@ -48,6 +46,7 @@ public class UserController {
                 .map(this::convertClothToClothDTO).toList());
     }
 
+    // unnecessary method
     @PostMapping("/clothes")
     public ResponseEntity<?> saveUserClothes(@RequestHeader("Authorization") String authHeader,
                                              @RequestBody List<ClothDTO> clothDTOs) {
@@ -55,14 +54,6 @@ public class UserController {
             throw new AppException("There are no clothes");
         userService.save(getUserFromHeader(authHeader).orElseThrow(() -> new AppException("User not found")),
                 clothDTOs.stream().map(this::convertClothDTOToCloth).toList());
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/clothes/update_name") // todo разобраться со случаем когда в бд есть две вещи со старым именем
-    public ResponseEntity<?> updateUserClothName(@RequestHeader("Authorization") String authHeader,
-                                                 @RequestBody RenameClothRequest request) {
-        userService.update(getUserFromHeader(authHeader).orElseThrow(() ->
-                new AppException("User not found")), request.getOldName(), request.getNewName());
         return ResponseEntity.ok().build();
     }
 
@@ -82,7 +73,7 @@ public class UserController {
         return result;
     }
 
-    private EmailResponse getUserEmail(User user) {
-        return modelMapper.map(user, EmailResponse.class);
+    private UserDTO getUserEmail(User user) {
+        return modelMapper.map(user, UserDTO.class);
     }
 }
