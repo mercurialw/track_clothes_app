@@ -4,11 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.berezhnov.dto.UserDTO;
 import ru.berezhnov.models.Cloth;
 import ru.berezhnov.dto.ClothDTO;
-import ru.berezhnov.models.User;
 import ru.berezhnov.services.ClothService;
+import ru.berezhnov.util.EmailExtractor;
 
 import java.util.List;
 
@@ -18,49 +17,47 @@ public class ClothesController {
 
     private final ModelMapper modelMapper;
     private final ClothService clothService;
+    private final EmailExtractor emailExtractor;
 
     @Autowired
-    public ClothesController(ModelMapper modelMapper, ClothService clothService) {
+    public ClothesController(ModelMapper modelMapper, ClothService clothService, EmailExtractor emailExtractor) {
         this.modelMapper = modelMapper;
         this.clothService = clothService;
+        this.emailExtractor = emailExtractor;
     }
 
     @GetMapping
-    public ResponseEntity<List<ClothDTO>> getAllCloths() {
-        return ResponseEntity.ok(clothService.findAll().stream()
+    public ResponseEntity<List<ClothDTO>> getAllCloths(@RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(clothService.findAllByUserEmail(emailExtractor.getUserFromHeader(authHeader)).stream()
                 .map(this::convertClothToClothDTO).toList());
     }
 
     @PostMapping
-    public ResponseEntity<?> addClothes(@RequestBody List<ClothDTO> clothDTOs) {
-        clothDTOs.forEach(clothDTO -> clothService.save(convertClothDTOToCloth(clothDTO)));
+    public ResponseEntity<?> addClothes(@RequestBody List<ClothDTO> clothDTOs,
+                                        @RequestHeader("Authorization") String authHeader) {
+        clothDTOs.forEach(clothDTO -> clothService.save(emailExtractor.getUserFromHeader(authHeader), convertClothDTOToCloth(clothDTO)));
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateClothes(@PathVariable("id") int id,
-                                           @RequestBody ClothDTO clothDTO) {
-        clothService.update(id, convertClothDTOToCloth(clothDTO));
+    @PatchMapping
+    public ResponseEntity<?> updateClothes(@RequestBody ClothDTO clothDTO,
+                                           @RequestHeader("Authorization") String authHeader) {
+        clothService.update(emailExtractor.getUserFromHeader(authHeader), convertClothDTOToCloth(clothDTO));
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClothes(@PathVariable("id") int id) {
-        clothService.delete(id);
+    public ResponseEntity<?> deleteClothes(@PathVariable("id") int id,
+                                           @RequestHeader("Authorization") String authHeader) {
+        clothService.delete(emailExtractor.getUserFromHeader(authHeader), id);
         return ResponseEntity.ok().build();
     }
 
     private ClothDTO convertClothToClothDTO(Cloth cloth) {
-        ClothDTO clothDTO = modelMapper.map(cloth, ClothDTO.class);
-        clothDTO.setOwner(convertUserToUserDTO(cloth.getOwner()));
-        return clothDTO;
+        return modelMapper.map(cloth, ClothDTO.class);
     }
 
     private Cloth convertClothDTOToCloth(ClothDTO clothDTO) {
         return modelMapper.map(clothDTO, Cloth.class);
-    }
-
-    private UserDTO convertUserToUserDTO(User user) {
-        return modelMapper.map(user, UserDTO.class);
     }
 }

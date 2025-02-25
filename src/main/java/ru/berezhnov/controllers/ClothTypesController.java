@@ -2,7 +2,6 @@ package ru.berezhnov.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
@@ -48,19 +47,23 @@ public class ClothTypesController {
         if (errors.hasErrors()) {
             throw new AppException("Cloth type already exists");
         }
-
         clothTypeService.save(emailExtractor.getUserFromHeader(authHeader), clothType);
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteClothType(@RequestBody ClothTypeDTO clothTypeDTO) {
-        String clothTypeName = clothTypeDTO.getName();
-        if (clothTypeService.findByName(clothTypeName).isPresent()) {
-            clothTypeService.delete(clothTypeName);
-            return ResponseEntity.ok(HttpStatus.OK);
-        }
-        throw new AppException("Cloth type does not exist");
+    @PatchMapping
+    public ResponseEntity<?> updateClothType(@RequestBody ClothTypeDTO clothTypeDTO,
+                                             @RequestHeader("Authorization") String authHeader) {
+        clothTypeService.update(emailExtractor.getUserFromHeader(authHeader),
+                convertClothTypeDTOToClothType(clothTypeDTO));
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteClothType(@PathVariable("id") int id,
+                                             @RequestHeader("Authorization") String authHeader) {
+        clothTypeService.deleteById(emailExtractor.getUserFromHeader(authHeader), id);
+        return ResponseEntity.ok().build();
     }
 
     private ClothTypeDTO convertClothTypeToClothTypeDTO(ClothType clothType) {
