@@ -1,13 +1,21 @@
 package ru.berezhnov.dto;
 
 public class ClothDTO {
-    private int id;
+    private Integer id;
     private String name;
     private String photoUrl;
     private String size;
     private ClothTypeDTO type;
     private PlaceDTO place;
     private UserDTO owner;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -47,14 +55,6 @@ public class ClothDTO {
 
     public void setSize(String size) {
         this.size = size;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public UserDTO getOwner() {
