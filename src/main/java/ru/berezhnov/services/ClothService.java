@@ -3,6 +3,7 @@ package ru.berezhnov.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.berezhnov.dto.UserDTO;
 import ru.berezhnov.models.Cloth;
 import ru.berezhnov.models.ClothType;
 import ru.berezhnov.models.Place;
@@ -12,9 +13,7 @@ import ru.berezhnov.repositories.ClothTypeRepository;
 import ru.berezhnov.repositories.PlaceRepository;
 import ru.berezhnov.repositories.UserRepository;
 import ru.berezhnov.util.AppException;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,74 +32,71 @@ public class ClothService {
         this.clothTypeRepository = clothTypeRepository;
     }
 
-    public List<Cloth> findAll() {
-        return clothRepository.findAll();
-    }
-
-    public Optional<Cloth> findById(int id) {
-        return clothRepository.findById(id);
+    public List<Cloth> findAllByUserEmail(UserDTO user) {
+        return clothRepository.findAllByUserEmail(user.getEmail());
     }
 
     @Transactional
-    public void save(Cloth cloth) {
-        User persistedUser = userRepository.findByEmail(cloth.getOwner().getEmail())
+    public void save(UserDTO user, Cloth cloth) {
+        User persistedUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new AppException("User not found"));
         Place persistedPlace = placeRepository.findByName(cloth.getPlace().getName())
                 .orElseThrow(() -> new AppException("Place not found"));
+        if (!persistedPlace.getOwner().equals(persistedUser)) {
+            throw new AppException("Place is not owned by user");
+        }
         ClothType persistedClothType = clothTypeRepository.findByName(cloth.getType()
                 .getName()).orElseThrow(() -> new AppException("ClothType not found"));
-        cloth.setOwner(persistedUser);
+        if (!persistedClothType.getOwner().equals(persistedUser)) {
+            throw new AppException("Cloth type is not owned by user");
+        }
         cloth.setPlace(persistedPlace);
         cloth.setType(persistedClothType);
         clothRepository.save(cloth);
     }
 
     @Transactional
-    public void save(User user, List<Cloth> list) {
-        User persistedUser = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new AppException("User not found"));
-        list.forEach(clothToSave -> {
-            clothToSave.setOwner(persistedUser);
-            ClothType persistedClothType = clothTypeRepository.findByName(clothToSave.getType().getName())
-                    .orElseThrow(() -> new AppException("Cloth type not found"));
-            clothToSave.setType(persistedClothType);
-            Place persistedPlace = placeRepository.findByName(clothToSave.getPlace().getName())
-                    .orElseThrow(() -> new AppException("Place not found"));
-            clothToSave.setPlace(persistedPlace);
-            clothRepository.save(clothToSave);
-        });
-    }
-
-    @Transactional
-    public void update(int id, Cloth proxyCloth) {
-        Cloth persistedCloth = clothRepository.findById(id).orElseThrow(() ->
+    public void update(UserDTO user, Cloth cloth) {
+        User persistedUser = userRepository.findByEmail(user.getEmail()).orElseThrow(() ->
+                new AppException("User not found"));
+        Cloth persistedCloth = clothRepository.findById(cloth.getId()).orElseThrow(() ->
                 new AppException("Cloth not found"));
-        if (proxyCloth.getName() != null) {
-            persistedCloth.setName(proxyCloth.getName());
+        if (!persistedCloth.getType().getOwner().equals(persistedUser)) {
+            throw new AppException("Cloth is not owned by user");
         }
-        if (proxyCloth.getPhotoUrl() != null) {
-            persistedCloth.setPhotoUrl(proxyCloth.getPhotoUrl());
+        if (cloth.getPlace() != null && cloth.getPlace().getName() != null) {
+            if (!cloth.getPlace().getOwner().equals(persistedUser)) {
+                throw new AppException("Place is not owned by user");
+            }
+            persistedCloth.setPlace(placeRepository.findByName(cloth.getPlace().getName())
+                    .orElseThrow(() -> new AppException("Place not found")));
         }
-        if (proxyCloth.getSize() != null) {
-            persistedCloth.setSize(proxyCloth.getSize());
+        if (cloth.getType() != null && cloth.getType().getName() != null) {
+            if (!cloth.getType().getOwner().equals(persistedUser)) {
+                throw new AppException("Cloth type is not owned by user");
+            }
+            persistedCloth.setType(clothTypeRepository.findByName(cloth.getType().getName())
+                    .orElseThrow(() -> new AppException("Cloth type not found")));
         }
-        if (proxyCloth.getType() != null && proxyCloth.getType().getName() != null) {
-            persistedCloth.setType(clothTypeRepository.findByName(proxyCloth.getType().getName())
-                .orElseThrow(() -> new AppException("ClothType not found")));
+        if (cloth.getName() != null) {
+            persistedCloth.setName(cloth.getName());
         }
-        if (proxyCloth.getPlace() != null && proxyCloth.getPlace().getName() != null) {
-            persistedCloth.setPlace(placeRepository.findByName(proxyCloth.getPlace().getName())
-                .orElseThrow(() -> new AppException("Place not found")));
+        if (cloth.getPhotoUrl() != null) {
+            persistedCloth.setPhotoUrl(cloth.getPhotoUrl());
         }
-        if (proxyCloth.getOwner() != null && proxyCloth.getOwner().getEmail() != null) {
-            persistedCloth.setOwner(userRepository.findByEmail(proxyCloth.getOwner().getEmail())
-                .orElseThrow(() -> new AppException("Owner not found")));
+        if (cloth.getSize() != null) {
+            persistedCloth.setSize(cloth.getSize());
         }
     }
 
     @Transactional
-    public void delete(int id) {
-        clothRepository.findById(id).orElseThrow(() -> new AppException("Cloth not found"));
+    public void delete(UserDTO user, int id) {
+        User persistedUser = userRepository.findByEmail(user.getEmail()).orElseThrow(() ->
+                new AppException("User not found"));
+        Cloth persistedCloth = clothRepository.findById(id).orElseThrow(() -> new AppException("Cloth not found"));
+        if (!persistedCloth.getType().getOwner().equals(persistedUser)) {
+            throw new AppException("Cloth type is not owned by user");
+        }
         clothRepository.deleteById(id);
     }
 }
