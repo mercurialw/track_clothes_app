@@ -56,6 +56,22 @@ public class ClothService {
     }
 
     @Transactional
+    public void save(User user, List<Cloth> list) {
+        User persistedUser = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new AppException("User not found"));
+        list.forEach(clothToSave -> {
+            clothToSave.setOwner(persistedUser);
+            ClothType persistedClothType = clothTypeRepository.findByName(clothToSave.getType().getName())
+                    .orElseThrow(() -> new AppException("Cloth type not found"));
+            clothToSave.setType(persistedClothType);
+            Place persistedPlace = placeRepository.findByName(clothToSave.getPlace().getName())
+                    .orElseThrow(() -> new AppException("Place not found"));
+            clothToSave.setPlace(persistedPlace);
+            clothRepository.save(clothToSave);
+        });
+    }
+
+    @Transactional
     public void update(int id, Cloth proxyCloth) {
         Cloth persistedCloth = clothRepository.findById(id).orElseThrow(() ->
                 new AppException("Cloth not found"));
