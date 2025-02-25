@@ -7,7 +7,6 @@ public class ClothDTO {
     private String size;
     private ClothTypeDTO type;
     private PlaceDTO place;
-    private UserDTO owner;
 
     public Integer getId() {
         return id;
@@ -55,13 +54,5 @@ public class ClothDTO {
 
     public void setSize(String size) {
         this.size = size;
-    }
-
-    public UserDTO getOwner() {
-        return owner;
-    }
-
-    public void setOwner(UserDTO owner) {
-        this.owner = owner;
     }
 }

@@ -24,10 +24,6 @@ public class Cloth {
     private ClothType type;
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "id")
-    private User owner;
-
-    @ManyToOne
     @JoinColumn(name = "place", referencedColumnName = "id")
     private Place place;
 
@@ -69,16 +65,6 @@ public class Cloth {
         this.photoUrl = photoUrl;
     }
 
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-        if (this.owner.getClothes() == null)
-            this.owner.setClothes(new ArrayList<>());
-        this.owner.getClothes().add(this);
-    }
 
     public Place getPlace() {
         return place;
