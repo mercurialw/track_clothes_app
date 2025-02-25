@@ -12,7 +12,6 @@ import java.util.Optional;
 @Repository
 public interface ClothTypeRepository extends JpaRepository<ClothType, Integer> {
     Optional<ClothType> findByName(String name);
-    void deleteByName(String name);
-    @Query("from ClothType ct inner join ct.clothes c inner join c.owner u where u.email = :ownerEmail") // select distinct ct
+    @Query("from ClothType ct inner join ct.owner u where u.email = :ownerEmail") // select distinct ct
     List<ClothType> findAllByUserEmail(@Param("ownerEmail") String ownerEmail);
 }

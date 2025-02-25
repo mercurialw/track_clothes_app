@@ -6,9 +6,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.berezhnov.models.Cloth;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface ClothRepository extends JpaRepository<Cloth, Integer> {
-    Optional<Cloth> findByName(String name);
+    @Query("from Cloth c inner join c.type ct inner join ct.owner u where u.email = :email")
+    List<Cloth> findAllByUserEmail(@Param("email") String email);
 }
