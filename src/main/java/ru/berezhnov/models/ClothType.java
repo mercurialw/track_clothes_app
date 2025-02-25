@@ -2,6 +2,7 @@ package ru.berezhnov.models;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,6 +15,10 @@ public class ClothType {
 
     @Column(name = "name")
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "id")
+    private User owner;
 
     @OneToMany(mappedBy = "type")
     private List<Cloth> clothes;
@@ -46,5 +51,16 @@ public class ClothType {
 
     public void setClothes(List<Cloth> clothes) {
         this.clothes = clothes;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+        if (this.owner.getClothTypes() == null)
+            this.owner.setClothTypes(new ArrayList<>());
+        this.owner.getClothTypes().add(this);
     }
 }
