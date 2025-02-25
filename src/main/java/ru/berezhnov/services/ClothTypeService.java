@@ -3,6 +3,7 @@ package ru.berezhnov.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.berezhnov.dto.UserDTO;
 import ru.berezhnov.models.ClothType;
 import ru.berezhnov.repositories.ClothTypeRepository;
 
@@ -20,8 +21,8 @@ public class ClothTypeService {
         this.clothTypeRepository = clothTypeRepository;
     }
 
-    public List<ClothType> findAll() {
-        return clothTypeRepository.findAll();
+    public List<ClothType> findAllByUserEmail(UserDTO user) {
+        return clothTypeRepository.findAllByUserEmail(user.getEmail());
     }
 
     public Optional<ClothType> findByName(String name) {
@@ -29,7 +30,8 @@ public class ClothTypeService {
     }
 
     @Transactional
-    public void save(ClothType clothType) {
+    public void save(UserDTO user, ClothType clothType) {
+
         clothTypeRepository.save(clothType);
     }
 
