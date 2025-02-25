@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "_user")
@@ -23,16 +24,15 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @OneToMany(mappedBy = "owner")
+    private List<Place> places;
 
     @OneToMany(mappedBy = "owner")
-    private List<Cloth> clothes;
+    private List<ClothType> clothTypes;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -81,28 +81,35 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public List<Cloth> getClothes() {
-        return clothes;
+    public List<Place> getPlaces() {
+        return places;
     }
 
-    public void setClothes(List<Cloth> clothes) {
-        this.clothes = clothes;
+    public void setPlaces(List<Place> places) {
+        this.places = places;
     }
 
-    public enum Role {
-        USER,
-        ADMIN
+    public List<ClothType> getClothTypes() {
+        return clothTypes;
+    }
+
+    public void setClothTypes(List<ClothType> clothTypes) {
+        this.clothTypes = clothTypes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(email, user.email) && Objects.equals(password, user.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, password);
     }
 }
