@@ -5,12 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.berezhnov.dto.UserDTO;
 import ru.berezhnov.models.Place;
+import ru.berezhnov.models.User;
 import ru.berezhnov.repositories.PlaceRepository;
 import ru.berezhnov.repositories.UserRepository;
 import ru.berezhnov.util.AppException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,11 +30,27 @@ public class PlaceService {
     }
 
     @Transactional
-    public void save(UserDTO user, Place place) {
-        place.setId(0);
-        place.setOwner(userRepository.findByEmail(user.getEmail()).orElseThrow(()
-                -> new AppException("User not found")));
-        placeRepository.save(place);
+    public void save(UserDTO user, Place placeToSave) {
+        placeToSave.setId(0);
+        User persistedUser = userRepository.findByEmail(user.getEmail()).orElseThrow(()
+                -> new AppException("User not found"));
+        if (persistedUser.getPlaces().stream().anyMatch(p -> placeToSave.getName().equals(p.getName())))
+            throw new AppException("Place already exists");
+        placeToSave.setOwner(persistedUser);
+        placeRepository.save(placeToSave);
+    }
+
+    @Transactional
+    public void update(UserDTO user, Place placeToUpdate) {
+        User persistedUser = userRepository.findByEmail(user.getEmail()).orElseThrow(()
+                -> new AppException("User not found"));
+        if (persistedUser.getPlaces().stream().anyMatch(p -> placeToUpdate.getName().equals(p.getName())))
+            throw new AppException("Place already exists");
+        if (persistedUser.getPlaces().stream().anyMatch(p -> p.getId() == placeToUpdate.getId())) {
+            placeRepository.findById(placeToUpdate.getId()).orElseThrow(()
+                    -> new AppException("Place not found")).setName(placeToUpdate.getName());
+        } else
+            throw new AppException("Place is not owned by user");
     }
 
     @Transactional
@@ -43,17 +59,6 @@ public class PlaceService {
                         -> new AppException("User not found")).getPlaces()
                 .stream().anyMatch(t -> t.getId() == id)) {
             placeRepository.deleteById(id);
-        } else
-            throw new AppException("Place is not owned by user");
-    }
-
-    @Transactional
-    public void update(UserDTO user, Place place) {
-        if (userRepository.findByEmail(user.getEmail()).orElseThrow(()
-                        -> new AppException("User not found")).getPlaces()
-                .stream().anyMatch(t -> t.getId() == place.getId())) {
-            placeRepository.findById(place.getId()).orElseThrow(()
-                    -> new AppException("Place not found")).setName(place.getName());
         } else
             throw new AppException("Place is not owned by user");
     }

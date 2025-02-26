@@ -4,14 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import ru.berezhnov.dto.PlaceDTO;
 import ru.berezhnov.models.Place;
 import ru.berezhnov.services.PlaceService;
 import ru.berezhnov.util.EmailExtractor;
-import ru.berezhnov.util.PlaceValidator;
 import ru.berezhnov.util.AppException;
 
 import java.util.List;
@@ -21,48 +18,43 @@ import java.util.List;
 public class PlacesController {
 
     private final PlaceService placeService;
-    private final PlaceValidator placeValidator;
     private final ModelMapper modelMapper;
     private final EmailExtractor emailExtractor;
 
     @Autowired
-    public PlacesController(final PlaceService placeService, PlaceValidator placeValidator,
-                            ModelMapper modelMapper, EmailExtractor emailExtractor) {
+    public PlacesController(final PlaceService placeService, ModelMapper modelMapper,
+                            EmailExtractor emailExtractor) {
         this.placeService = placeService;
-        this.placeValidator = placeValidator;
         this.modelMapper = modelMapper;
         this.emailExtractor = emailExtractor;
     }
 
     @GetMapping
-    public ResponseEntity<List<PlaceDTO>> getClothTypes(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<PlaceDTO>> getPlaces(@RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(placeService.findAllByUserEmail(emailExtractor.getUserFromHeader(authHeader))
                 .stream().map(this::convertPlaceToPlaceDTO).toList());
     }
 
     @PostMapping
-    public ResponseEntity<?> saveClothType(@RequestBody PlaceDTO placeDTO,
-                                           @RequestHeader("Authorization") String authHeader) {
-        Place place = convertPlaceDTOToPlace(placeDTO);
-        Errors errors = new BeanPropertyBindingResult(place, "place");
-        placeValidator.validate(place, errors);
-        if (errors.hasErrors()) {
-            throw new AppException("Place already exists");
-        }
-        placeService.save(emailExtractor.getUserFromHeader(authHeader), place);
+    public ResponseEntity<?> savePlace(@RequestBody PlaceDTO placeDTO,
+                                       @RequestHeader("Authorization") String authHeader) {
+        placeService.save(emailExtractor.getUserFromHeader(authHeader),
+                convertPlaceDTOToPlace(placeDTO));
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateClothType(@RequestBody PlaceDTO placeDTO,
-                                             @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> updatePlace(@RequestBody PlaceDTO placeDTO,
+                                         @RequestHeader("Authorization") String authHeader) {
+        if (placeDTO.getId() == null)
+            throw new AppException("Place id is required");
         placeService.update(emailExtractor.getUserFromHeader(authHeader),
                 convertPlaceDTOToPlace(placeDTO));
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClothType(@PathVariable("id") int id,
+    public ResponseEntity<?> deletePlace(@PathVariable("id") int id,
                                              @RequestHeader("Authorization") String authHeader) {
         placeService.deleteById(emailExtractor.getUserFromHeader(authHeader), id);
         return ResponseEntity.ok().build();
