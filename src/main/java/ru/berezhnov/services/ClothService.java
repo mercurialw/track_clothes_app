@@ -38,6 +38,7 @@ public class ClothService {
 
     @Transactional
     public void save(UserDTO user, Cloth cloth) {
+        cloth.setId(0);
         User persistedUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new AppException("User not found"));
         Place persistedPlace = placeRepository.findByName(cloth.getPlace().getName())
