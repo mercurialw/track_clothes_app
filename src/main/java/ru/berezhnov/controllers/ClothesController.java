@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.berezhnov.dto.ClothAddRequest;
 import ru.berezhnov.models.Cloth;
 import ru.berezhnov.dto.ClothDTO;
 import ru.berezhnov.services.ClothService;
@@ -33,9 +34,9 @@ public class ClothesController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addClothes(@RequestBody List<ClothDTO> clothDTOs,
+    public ResponseEntity<?> addClothes(@RequestBody ClothAddRequest clothAddRequest,
                                         @RequestHeader("Authorization") String authHeader) {
-        clothDTOs.forEach(clothDTO -> clothService.save(emailExtractor.getUserFromHeader(authHeader), convertClothDTOToCloth(clothDTO)));
+        clothService.save(emailExtractor.getUserFromHeader(authHeader), clothAddRequest);
         return ResponseEntity.ok().build();
     }
 
