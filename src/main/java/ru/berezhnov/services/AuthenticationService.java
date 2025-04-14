@@ -10,6 +10,7 @@ import ru.berezhnov.dto.AuthenticationResponse;
 import ru.berezhnov.config.JwtService;
 import ru.berezhnov.models.User;
 import ru.berezhnov.repositories.UserRepository;
+import ru.berezhnov.util.AppException;
 
 @Service
 public class AuthenticationService {
@@ -29,6 +30,9 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(AuthenticationRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AppException("Email already registered");
+        }
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -40,18 +44,20 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow();
-        String jwtToken = jwtService.generateToken(user);
+                .orElseThrow(() -> new AppException("Invalid email"));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new AppException("Invalid password");
+        }
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setToken(jwtToken);
+        authenticationResponse.setToken(jwtService.generateToken(user));
         return authenticationResponse;
     }
 }
